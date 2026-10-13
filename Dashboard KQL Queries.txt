@@ -1,0 +1,21 @@
+
+// base_bike_data base query
+bikes
+     | where ingestion_time() between (ago(30min) .. now())
+       and (isempty(['selected_neighbourhoods']) or Neighbourhood  in (['selected_neighbourhoods']))
+     | summarize latest_observation = arg_max(ingestion_time(), *) by Neighbourhood
+
+//Bikes and docks stacked bar chart query
+ base_bike_data
+ | project Neighbourhood, latest_observation, No_Bikes, No_Empty_Docks
+ | order by Neighbourhood asc
+
+//Bike Locations map query
+ base_bike_data
+ | project Neighbourhood, latest_observation, No_Bikes, Latitude, Longitude
+ | order by Neighbourhood asc
+
+//Latest Obs by Neighbourhood query
+ base_bike_data
+ | project Neighbourhood, latest_observation, Street, No_Bikes, No_Empty_Docks
+ | order by latest_observation desc
